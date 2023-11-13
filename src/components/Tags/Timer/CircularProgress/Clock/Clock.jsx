@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState,useRef } from "react";
 import { StateContext } from "../../../../StateProvider";
  
 
@@ -9,6 +9,48 @@ import { StateContext } from "../../../../StateProvider";
 const Clock = () => {
  
     const { time, setTime, isActive, setIsActive, initTime } = useContext(StateContext);
+
+
+
+
+
+    const [seconds, setSeconds] = useState(10);
+    const [isRunning, setIsRunning] = useState(false);
+    const audioRef = useRef(null);
+    useEffect(() => {
+        let intervalId;
+    
+        if (isRunning && time > 0) {
+          intervalId = setInterval(() => {
+            setSeconds((prevSeconds) => prevSeconds - 1);
+          }, 1000);
+        } else if (time === 0) {
+          // Play the sound when the countdown reaches 0
+          if (audioRef.current) {
+            audioRef.current.play();
+          }
+          // You can add additional actions or reset the timer here
+          setIsRunning(false);
+        }
+    
+        return () => clearInterval(intervalId);
+      }, [isRunning, time]);
+    
+      const startTimer = () => {
+        setIsRunning(true);
+      };
+    
+      const resetTimer = () => {
+        setIsRunning(false);
+        setSeconds(time); // Set your desired initial countdown value
+      };
+
+
+
+
+
+
+
 
     //to make countdown we will use useEfect() hook 
     //using this we will decrease the value of time variable used in useState() hook
@@ -51,7 +93,21 @@ const Clock = () => {
         return `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
     }
 
-    return (<ClockContainer> 
+    return (
+    
+    
+    
+    <ClockContainer> 
+
+<audio ref={audioRef}>
+        <source src='src/assets/alarm-tone.wav' type="audio/mp3" />
+         
+      </audio>
+
+
+
+
+
         <TimerText>
             {getTime(time)}
         </TimerText>
